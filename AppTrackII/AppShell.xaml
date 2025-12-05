@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:AppTrackII.Pages"
+       xmlns:auth="clr-namespace:AppTrackII.Pages.Auth"
+       xmlns:reg="clr-namespace:AppTrackII.Pages.Register"
+       xmlns:scan="clr-namespace:AppTrackII.Pages.Scan"
+       x:Class="AppTrackII.AppShell"
+       Shell.FlyoutBehavior="Disabled"
+       Shell.NavBarIsVisible="False"
+       BackgroundColor="{StaticResource PageBackgroundColor}">
+
+    <!-- Home sigue siendo la primera pantalla -->
+    <ShellContent
+        Route="HomePage"
+        ContentTemplate="{DataTemplate pages:HomePage}" />
+</Shell>

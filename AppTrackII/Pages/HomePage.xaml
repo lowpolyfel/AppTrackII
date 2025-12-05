@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppTrackII.ViewModels"
+    x:Class="AppTrackII.Pages.HomePage"
+    Title="">
+
+    <ContentPage.BindingContext>
+        <vm:HomeViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Encabezado minimal -->
+        <Grid Grid.Row="0" Padding="0,0,0,24">
+            <Label Text="TrackII · Panel móvil"
+                   FontSize="13"
+                   TextColor="{StaticResource TextSecondaryColor}" />
+        </Grid>
+
+        <!-- Contenido central -->
+        <Grid Grid.Row="1">
+            <VerticalStackLayout
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Spacing="24">
+
+                <Label Text="AppTrackII"
+                       Style="{StaticResource TitleLabelStyle}"
+                       HorizontalOptions="Center" />
+
+                <Label Text="Registra dispositivos y escanea piezas desde una interfaz clara y enfocada."
+                       Style="{StaticResource SubtitleLabelStyle}"
+                       WidthRequest="320"
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="Center" />
+
+                <Frame WidthRequest="340">
+                    <VerticalStackLayout Spacing="12">
+
+                        <Button Text="Registrar dispositivo"
+                                Command="{Binding GoToRegisterCommand}" />
+
+                        <Button Text="Iniciar sesión"
+                                Command="{Binding GoToLoginCommand}"
+                                Style="{StaticResource SecondaryButtonStyle}" />
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

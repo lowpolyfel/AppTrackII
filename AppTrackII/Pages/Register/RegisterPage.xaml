@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppTrackII.ViewModels"
+    x:Class="AppTrackII.Pages.Register.RegisterPage"
+    Title="">
+
+    <ContentPage.BindingContext>
+        <vm:RegisterViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="24">
+
+            <Label Text="Registrar dispositivo"
+                   Style="{StaticResource TitleLabelStyle}" />
+
+            <Frame>
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="Android ID"
+                           Style="{StaticResource SubtitleLabelStyle}" />
+                    <Entry Text="{Binding AndroidId}"
+                           IsReadOnly="True" />
+
+                    <Label Text="Localidad"
+                           Style="{StaticResource SubtitleLabelStyle}" />
+                    <Picker ItemsSource="{Binding Localidades}"
+                            ItemDisplayBinding="{Binding Nombre}"
+                            SelectedItem="{Binding LocalidadSeleccionada}"
+                            Title="Selecciona una localidad" />
+
+                    <Label Text="Nombre del dispositivo"
+                           Style="{StaticResource SubtitleLabelStyle}" />
+                    <Entry Placeholder="Ej: Tablet Línea 1"
+                           Text="{Binding NombreDispositivo}" />
+
+                    <Button Text="Registrar"
+                            Command="{Binding RegisterCommand}" />
+
+                    <Button Text="Cancelar"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding CancelCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

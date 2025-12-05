@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppTrackII.Pages.Scan.ScanPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewModels="clr-namespace:AppTrackII.ViewModels">
+
+    <ContentPage.BindingContext>
+        <viewModels:ScanViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Padding>
+        <OnIdiom x:TypeArguments="Thickness">
+            <OnIdiom.Phone>16,16,16,16</OnIdiom.Phone>
+            <OnIdiom.Tablet>32,32,32,32</OnIdiom.Tablet>
+        </OnIdiom>
+    </ContentPage.Padding>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0" Padding="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Text="Escaneo"
+                   Style="{StaticResource TitleLabelStyle}" />
+
+            <StackLayout Grid.Column="1"
+                         HorizontalOptions="End"
+                         Spacing="2">
+                <Label Text="{Binding DeviceName}"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="End" />
+                <Label Text="{Binding DeviceLocalidad}"
+                       FontSize="14"
+                       TextColor="{StaticResource TextSecondaryColor}"
+                       HorizontalTextAlignment="End" />
+            </StackLayout>
+        </Grid>
+
+        <!-- CONTENIDO -->
+        <Grid Grid.Row="1" ColumnSpacing="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- FORMULARIO -->
+            <Frame Grid.Column="0">
+                <VerticalStackLayout Spacing="16">
+
+                    <Label Text="Datos de pieza"
+                           Style="{StaticResource SubtitleLabelStyle}" />
+
+                    <StackLayout Spacing="4">
+                        <Label Text="Número de Lote"
+                               Style="{StaticResource SubtitleLabelStyle}" />
+                        <Entry Text="{Binding Lote}"
+                               Placeholder="Escanea el número de lote" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="4">
+                        <Label Text="Número de Parte"
+                               Style="{StaticResource SubtitleLabelStyle}" />
+                        <Entry Text="{Binding NumeroParte}"
+                               Placeholder="Escanea o captura el número de parte" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="4">
+                        <Label Text="Cantidad de Piezas"
+                               Style="{StaticResource SubtitleLabelStyle}" />
+                        <Entry Text="{Binding CantidadPiezas}"
+                               Keyboard="Numeric"
+                               Placeholder="CAPTURA la cantidad de piezas" />
+                    </StackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- CÁMARA -->
+            <Frame Grid.Column="1">
+                <Grid RowDefinitions="Auto,Auto,*,Auto"
+                      RowSpacing="16">
+
+                    <Label Grid.Row="0"
+                           Text="Cámara para escaneo"
+                           Style="{StaticResource SubtitleLabelStyle}" />
+
+                    <Frame Grid.Row="1"
+                           BackgroundColor="{StaticResource ErrorBackgroundColor}"
+                           BorderColor="{StaticResource ErrorBackgroundColor}"
+                           CornerRadius="14"
+                           HasShadow="False"
+                           Padding="10">
+                        <Label Text="{Binding CameraStatusMessage}"
+                               FontSize="13"
+                               TextColor="{StaticResource ErrorTextColor}" />
+                    </Frame>
+
+                    <Grid Grid.Row="2">
+                        <Border StrokeThickness="1"
+                                Stroke="{StaticResource BorderColor}"
+                                StrokeShape="RoundRectangle 20">
+                            <Grid>
+                                <Label Text="Vista de cámara"
+                                       FontSize="14"
+                                       TextColor="{StaticResource TextSecondaryColor}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="3"
+                          ColumnDefinitions="*,Auto,Auto"
+                          ColumnSpacing="12">
+
+                        <Picker Grid.Column="0"
+                                ItemsSource="{Binding Cameras}"
+                                SelectedItem="{Binding SelectedCamera}"
+                                Title="Selecciona cámara" />
+
+                        <Button Grid.Column="1"
+                                Text="Iniciar"
+                                Command="{Binding StartScanCommand}" />
+
+                        <Button Grid.Column="2"
+                                Text="Detener"
+                                Command="{Binding StopScanCommand}"
+                                BackgroundColor="{StaticResource TextPrimaryColor}" />
+                    </Grid>
+                </Grid>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>

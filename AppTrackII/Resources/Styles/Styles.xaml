@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- PÁGINAS -->
+    <Style TargetType="ContentPage">
+        <Setter Property="BackgroundColor" Value="{StaticResource PageBackgroundColor}" />
+        <Setter Property="Padding" Value="24" />
+    </Style>
+
+    <!-- LABELS -->
+    <Style TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+    </Style>
+
+    <!-- Título principal -->
+    <Style x:Key="TitleLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+    </Style>
+
+    <!-- Subtítulo / texto suave -->
+    <Style x:Key="SubtitleLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource TextSecondaryColor}" />
+    </Style>
+
+    <!-- TARJETAS: sin verde, sin sombras pesadas -->
+    <Style TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardColor}" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="HasShadow" Value="False" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="BorderColor" Value="{StaticResource BorderColor}" />
+    </Style>
+
+    <!-- ENTRADAS -->
+    <Style TargetType="Entry">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardColor}" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource PlaceholderColor}" />
+        <Setter Property="HeightRequest" Value="44" />
+        <Setter Property="Margin" Value="0,4,0,14" />
+    </Style>
+
+    <!-- PICKERS -->
+    <Style TargetType="Picker">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardColor}" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+        <Setter Property="HeightRequest" Value="44" />
+        <Setter Property="Margin" Value="0,4,0,14" />
+    </Style>
+
+    <!-- BOTÓN PRINCIPAL (pastilla de acento indigo) -->
+    <Style TargetType="Button">
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="18,10" />
+        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColor}" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Margin" Value="0,12,0,0" />
+    </Style>
+
+    <!-- BOTÓN SECUNDARIO (outline) -->
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="18,10" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderColor" Value="{StaticResource BorderColor}" />
+        <Setter Property="BorderWidth" Value="1" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+        <Setter Property="Margin" Value="0,12,0,0" />
+    </Style>
+
+</ResourceDictionary>
