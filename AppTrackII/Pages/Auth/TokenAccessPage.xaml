@@ -3,41 +3,31 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AppTrackII.ViewModels"
-    x:Class="AppTrackII.Pages.Auth.TokenAccessPage"
-    Title="">
+    x:Class="AppTrackII.Pages.Auth.TokenAccessPage">
 
     <ContentPage.BindingContext>
         <vm:TokenAccessViewModel />
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto, *">
+        <Button Grid.Row="0" Text="← Cancelar" 
+                Command="{Binding CancelCommand}" 
+                HorizontalOptions="Start" 
+                BackgroundColor="Transparent" 
+                TextColor="{StaticResource TextSecondaryColor}"
+                Margin="10,10,0,0"/>
 
-        <Label Grid.Row="0"
-           Text="Registro de dispositivo"
-           Style="{StaticResource TitleLabelStyle}"
-           HorizontalOptions="Center"
-           HorizontalTextAlignment="Center"
-           Margin="0,0,0,24" />
-
-        <VerticalStackLayout Grid.Row="1"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center">
+        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="30">
+            <Label Text="Validación" Style="{StaticResource TitleLabelStyle}" HorizontalOptions="Center"/>
 
             <Frame WidthRequest="360">
                 <VerticalStackLayout Spacing="16">
+                    <Label Text="Ingrese el token de seguridad para configurar el dispositivo." 
+                           Style="{StaticResource SubtitleLabelStyle}" HorizontalTextAlignment="Center"/>
 
-                    <Label Text="Introduce el token de acceso para continuar."
-                           Style="{StaticResource SubtitleLabelStyle}" />
+                    <Entry Placeholder="Token de acceso (Ej: TK-9901)" Text="{Binding Token}" HorizontalTextAlignment="Center" />
 
-                    <Entry Placeholder="Token de acceso"
-                           Text="{Binding Token}" />
-
-                    <Button Text="Continuar"
-                            Command="{Binding ContinueCommand}" />
-
-                    <Button Text="Cancelar"
-                            Style="{StaticResource SecondaryButtonStyle}"
-                            Command="{Binding CancelCommand}" />
+                    <Button Text="Validar Token" Command="{Binding ContinueCommand}" />
                 </VerticalStackLayout>
             </Frame>
         </VerticalStackLayout>

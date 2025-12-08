@@ -5,7 +5,9 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 using AppTrackII.Pages.Scan;
-using ZXing.Net.Maui.Controls; // Importante
+using AppTrackII.Pages.Scrap;      // Nuevo
+using AppTrackII.Pages.Retrabajo;  // Nuevo
+using ZXing.Net.Maui.Controls;
 
 namespace AppTrackII
 {
@@ -17,7 +19,7 @@ namespace AppTrackII
 
             builder
                 .UseMauiApp<App>()
-                .UseBarcodeReader() // Inicializar ZXing
+                .UseBarcodeReader()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -27,11 +29,19 @@ namespace AppTrackII
             // Servicios
             builder.Services.AddSingleton<ILocalidadService, MockLocalidadService>();
 
-            // ViewModels
+            // ViewModels existentes
             builder.Services.AddTransient<ScanViewModel>();
 
-            // Pages
+            // ViewModels Nuevos
+            builder.Services.AddTransient<ScrapViewModel>();
+            builder.Services.AddTransient<RetrabajoViewModel>();
+
+            // Pages existentes
             builder.Services.AddTransient<ScanPage>();
+
+            // Pages Nuevas
+            builder.Services.AddTransient<ScrapPage>();
+            builder.Services.AddTransient<RetrabajoPage>();
 
             return builder.Build();
         }

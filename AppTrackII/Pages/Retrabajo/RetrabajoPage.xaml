@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppTrackII.ViewModels"
+             x:Class="AppTrackII.Pages.Retrabajo.RetrabajoPage"
+             BackgroundColor="{StaticResource PageBackgroundColor}">
+
+    <ContentPage.BindingContext>
+        <vm:RetrabajoViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto, *">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Padding="10,10,24,10">
+            <Button Text="←" Command="{Binding CancelCommand}" 
+                    BackgroundColor="Transparent" 
+                    TextColor="{StaticResource TextPrimaryColor}" 
+                    WidthRequest="40" 
+                    HeightRequest="40"
+                    FontSize="20"/>
+            <Label Grid.Column="1" Text="Enviar a Retrabajo" 
+                   Style="{StaticResource TitleLabelStyle}" 
+                   VerticalOptions="Center" 
+                   HorizontalOptions="End"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="24" Padding="24">
+
+                <Frame BackgroundColor="{StaticResource CardColor}" HasShadow="False" CornerRadius="16" BorderColor="{StaticResource BorderColor}">
+                    <VerticalStackLayout Spacing="20">
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="ORIGEN DE LA PIEZA" FontSize="11" TextColor="{StaticResource TextSecondaryColor}" FontAttributes="Bold"/>
+                            <Border BackgroundColor="#F3F4F6" StrokeThickness="0" Padding="12" StrokeShape="RoundRectangle 8">
+                                <Label Text="{Binding LocalidadOrigen}" 
+                                       FontSize="16" 
+                                       TextColor="{StaticResource TextPrimaryColor}"
+                                       FontAttributes="Bold"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="INSTRUCCIONES" FontSize="11" TextColor="{StaticResource TextSecondaryColor}" FontAttributes="Bold"/>
+                            <Editor Text="{Binding InstruccionesRetrabajo}"
+                                    Placeholder="Detalla el trabajo a realizar..."
+                                    HeightRequest="120"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    AutoSize="TextChanges"/>
+                        </VerticalStackLayout>
+
+                        <Button Text="Generar Orden" 
+                                Command="{Binding SaveCommand}" 
+                                BackgroundColor="#F59E0B" 
+                                TextColor="White"
+                                Margin="0,10,0,0"/>
+
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

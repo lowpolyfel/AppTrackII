@@ -11,22 +11,26 @@
     </ContentPage.BindingContext>
 
     <Grid RowDefinitions="Auto,*">
-        <!-- Encabezado minimal -->
         <Grid Grid.Row="0" Padding="0,0,0,24">
-            <Label Grid.Row="0"
-           Text="AppTrackII"
-           Style="{StaticResource TitleLabelStyle}"
-           HorizontalOptions="Center"
-           HorizontalTextAlignment="Center"
-           Margin="0,0,0,24" />
+            <Label Text="TrackII · Panel móvil"
+                   FontSize="13"
+                   TextColor="{StaticResource TextSecondaryColor}" />
         </Grid>
 
-        <!-- Contenido central -->
         <Grid Grid.Row="1">
             <VerticalStackLayout
                 VerticalOptions="Center"
                 HorizontalOptions="Center"
                 Spacing="24">
+
+                <Image Source="apptrack_logo.png"
+                       HeightRequest="120"
+                       WidthRequest="120"
+                       HorizontalOptions="Center">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding LogoTappedCommand}" />
+                    </Image.GestureRecognizers>
+                </Image>
 
                 <Label Text="AppTrackII"
                        Style="{StaticResource TitleLabelStyle}"
@@ -42,11 +46,12 @@
                     <VerticalStackLayout Spacing="12">
 
                         <Button Text="Registrar dispositivo"
-                                Command="{Binding GoToRegisterCommand}" />
+                                Command="{Binding GoToRegisterCommand}"
+                                IsVisible="{Binding IsRegisterVisible}"
+                                BackgroundColor="{StaticResource TextPrimaryColor}" />
 
                         <Button Text="Iniciar sesión"
-                                Command="{Binding GoToLoginCommand}"
-                                Style="{StaticResource SecondaryButtonStyle}" />
+                                Command="{Binding GoToLoginCommand}" />
                     </VerticalStackLayout>
                 </Frame>
             </VerticalStackLayout>

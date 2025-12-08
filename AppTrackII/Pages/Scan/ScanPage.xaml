@@ -5,192 +5,146 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewModels="clr-namespace:AppTrackII.ViewModels"
     xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.Maui.Controls"
-    xmlns:zxingCore="clr-namespace:ZXing.Net.Maui;assembly=ZXing.Net.Maui">
+    xmlns:zxingCore="clr-namespace:ZXing.Net.Maui;assembly=ZXing.Net.Maui"
+    BackgroundColor="{StaticResource PageBackgroundColor}">
 
     <ContentPage.BindingContext>
         <viewModels:ScanViewModel />
     </ContentPage.BindingContext>
 
-    <ContentPage.Padding>
-        <OnIdiom x:TypeArguments="Thickness">
-            <OnIdiom.Phone>16,16,16,16</OnIdiom.Phone>
-            <OnIdiom.Tablet>32,32,32,32</OnIdiom.Tablet>
-        </OnIdiom>
-    </ContentPage.Padding>
+    <Grid RowDefinitions="Auto, *">
 
-    <Grid RowDefinitions="Auto,*">
-
-        <Grid Grid.Row="0" Padding="0,0,0,24">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Label Text="Escaneo de Piezas"
-                   Style="{StaticResource TitleLabelStyle}" />
-
-            <StackLayout Grid.Column="1"
-                         HorizontalOptions="End"
-                         Spacing="2">
-                <Label Text="{Binding DeviceName}"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       HorizontalTextAlignment="End" />
-                <Label Text="{Binding DeviceLocalidad}"
-                       FontSize="14"
-                       TextColor="{StaticResource TextSecondaryColor}"
-                       HorizontalTextAlignment="End" />
-            </StackLayout>
-        </Grid>
-
-        <Grid Grid.Row="1" ColumnSpacing="24">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-            </Grid.ColumnDefinitions>
-
-            <Frame Grid.Column="0" BackgroundColor="{StaticResource SecondaryColor}">
-                <VerticalStackLayout Spacing="24">
-
-                    <Label Text="Datos de Pieza Escaneada"
-                           Style="{StaticResource SubtitleLabelStyle}" />
-
-                    <StackLayout Spacing="4">
-                        <Label Text="Número de Lote" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}"/>
-                        <Border BackgroundColor="#F9FAFB" StrokeShape="RoundRectangle 8" Padding="12">
-                            <Label Text="{Binding Lote, TargetNullValue='Esperando escaneo...'}" 
-                                   FontSize="16" 
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimaryColor}"/>
-                        </Border>
-                    </StackLayout>
-
-                    <StackLayout Spacing="4">
-                        <Label Text="Número de Parte" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}"/>
-                        <Border BackgroundColor="#F9FAFB" StrokeShape="RoundRectangle 8" Padding="12">
-                            <Label Text="{Binding NumeroParte, TargetNullValue='Esperando escaneo...'}" 
-                                   FontSize="16" 
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimaryColor}"/>
-                        </Border>
-                    </StackLayout>
-
-                    <StackLayout Spacing="4">
-                        <Label Text="Cantidad de Piezas" FontAttributes="Bold" TextColor="{StaticResource TextSecondaryColor}"/>
-                        <Entry Text="{Binding CantidadPiezas}"
-                               Keyboard="Numeric"
-                               Placeholder="Ingrese cantidad manualmente" />
-                    </StackLayout>
-
-                    <Button Text="Finalizar Captura" 
-                            BackgroundColor="{StaticResource PrimaryColor}" 
-                            TextColor="White"
-                            Margin="0,20,0,0"/>
-
+        <Frame Grid.Row="0" Margin="0,0,0,16" Padding="20" BackgroundColor="White" HasShadow="False" BorderColor="{StaticResource BorderColor}" CornerRadius="0">
+            <Grid ColumnDefinitions="*, Auto">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Escaneo activo" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimaryColor}"/>
+                    <Label Text="{Binding CameraStatusMessage}" FontSize="12" TextColor="{StaticResource TextSecondaryColor}"/>
                 </VerticalStackLayout>
-            </Frame>
 
-            <Frame Grid.Column="1" Padding="0" IsClippedToBounds="True" CornerRadius="20" BackgroundColor="Black">
-                <Grid>
+                <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="0">
+                    <Label Text="{Binding DeviceName}" 
+                           FontSize="14" FontAttributes="Bold" 
+                           TextColor="{StaticResource PrimaryColor}" 
+                           HorizontalTextAlignment="End"/>
+                    <Label Text="{Binding DeviceLocalidad}" 
+                           FontSize="12" 
+                           TextColor="{StaticResource TextSecondaryColor}" 
+                           HorizontalTextAlignment="End"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
 
-                    <zxing:CameraBarcodeReaderView
-                        x:Name="barcodeView"
-                        IsDetecting="{Binding IsDetecting}"
-                        CameraLocation="{Binding CameraLocation}"
-                        BarcodesDetected="CameraBarcodeReaderView_BarcodesDetected">
-                        <zxing:CameraBarcodeReaderView.Options>
-                            <zxingCore:BarcodeReaderOptions 
-                                AutoRotate="True"
-                                TryHarder="True" 
-                                Formats="QrCode,Code128,Ean13,Code39"/>
-                        </zxing:CameraBarcodeReaderView.Options>
-                    </zxing:CameraBarcodeReaderView>
+        <Grid Grid.Row="1" Padding="24,0,24,24">
+            <Grid ColumnDefinitions="*, 2*" ColumnSpacing="24">
 
-                    <Grid>
+                <Frame Grid.Column="0" VerticalOptions="Fill" BackgroundColor="{StaticResource CardColor}" BorderColor="{StaticResource BorderColor}">
+                    <VerticalStackLayout Spacing="20">
+                        <Label Text="Detalle de Pieza" Style="{StaticResource SubtitleLabelStyle}" />
 
-                        <Grid RowDefinitions="*, 2*, *" ColumnDefinitions="*, 2*, *" InputTransparent="True">
-                            <BoxView Grid.Row="0" Grid.ColumnSpan="3" BackgroundColor="#AA000000" />
-                            <BoxView Grid.Row="2" Grid.ColumnSpan="3" BackgroundColor="#AA000000" />
-                            <BoxView Grid.Row="1" Grid.Column="0" BackgroundColor="#AA000000" />
-                            <BoxView Grid.Row="1" Grid.Column="2" BackgroundColor="#AA000000" />
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Lote" FontSize="11" TextColor="{StaticResource TextSecondaryColor}" TextTransform="Uppercase"/>
+                            <Label Text="{Binding Lote, TargetNullValue='---'}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimaryColor}"/>
+                            <BoxView HeightRequest="1" Color="{StaticResource BorderColor}"/>
+                        </VerticalStackLayout>
 
-                            <Border x:Name="ScanContainer"
-                                    Grid.Row="1" Grid.Column="1"
-                                    Stroke="White"
-                                    StrokeThickness="3"
-                                    StrokeShape="RoundRectangle 20"
-                                    BackgroundColor="Transparent">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="No. Parte" FontSize="11" TextColor="{StaticResource TextSecondaryColor}" TextTransform="Uppercase"/>
+                            <Label Text="{Binding NumeroParte, TargetNullValue='---'}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimaryColor}"/>
+                            <BoxView HeightRequest="1" Color="{StaticResource BorderColor}"/>
+                        </VerticalStackLayout>
 
-                                <Grid>
-                                    <BoxView x:Name="LaserLine"
-                                             HeightRequest="2"
-                                             Color="#EF4444" 
-                                             VerticalOptions="Start"
-                                             HorizontalOptions="Fill"
-                                             Opacity="0.8">
-                                        <BoxView.Shadow>
-                                            <Shadow Brush="#EF4444" Radius="10" Opacity="1"/>
-                                        </BoxView.Shadow>
-                                    </BoxView>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Cantidad" FontSize="11" TextColor="{StaticResource TextSecondaryColor}" TextTransform="Uppercase"/>
+                            <Entry Text="{Binding CantidadPiezas}" 
+                                   Keyboard="Numeric" 
+                                   Placeholder="0" 
+                                   BackgroundColor="Transparent" 
+                                   Margin="0"
+                                   TextColor="{StaticResource TextPrimaryColor}"/>
+                        </VerticalStackLayout>
 
-                                    <BoxView x:Name="SuccessFlash"
-                                             BackgroundColor="#10B981"
-                                             Opacity="0"
-                                             HorizontalOptions="Fill"
-                                             VerticalOptions="Fill"/>
+                        <Button Text="Procesar Captura" Margin="0,10,0,0"/>
 
-                                    <Label x:Name="SuccessLabel"
-                                           Text="✓ LECTURA OK"
-                                           TextColor="White"
-                                           FontSize="22"
-                                           FontAttributes="Bold"
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center"
-                                           Opacity="0"
-                                           Scale="0.5"/>
-                                </Grid>
-                            </Border>
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="12" Margin="0,10,0,0">
+
+                            <Button Grid.Column="0" 
+                                    Text="Scrap" 
+                                    Command="{Binding GoToScrapCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    TextColor="{StaticResource ErrorTextColor}"
+                                    BorderColor="{StaticResource ErrorTextColor}"
+                                    BackgroundColor="Transparent"/>
+
+                            <Button Grid.Column="1" 
+                                    Text="Retrabajo" 
+                                    Command="{Binding GoToRetrabajoCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    TextColor="#D97706"
+                                    BorderColor="#D97706"
+                                    BackgroundColor="Transparent"/>
                         </Grid>
 
-                        <Grid VerticalOptions="End" 
-                              ColumnDefinitions="*,*,*" 
-                              ColumnSpacing="10" 
-                              Padding="20">
+                    </VerticalStackLayout>
+                </Frame>
 
-                            <Button Grid.Column="0"
-                                    Text="Cámara"
-                                    Command="{Binding SwitchCameraCommand}"
-                                    BackgroundColor="#374151"
-                                    TextColor="White"
-                                    CornerRadius="12"/>
+                <Frame Grid.Column="1" Padding="0" IsClippedToBounds="True" CornerRadius="16" BackgroundColor="Black" BorderColor="Transparent">
+                    <Grid>
+                        <zxing:CameraBarcodeReaderView 
+                            x:Name="barcodeView" 
+                            IsDetecting="{Binding IsDetecting}" 
+                            CameraLocation="{Binding CameraLocation}" 
+                            BarcodesDetected="CameraBarcodeReaderView_BarcodesDetected">
+                            <zxing:CameraBarcodeReaderView.Options>
+                                <zxingCore:BarcodeReaderOptions 
+                                    AutoRotate="True"
+                                    TryHarder="True" 
+                                    Formats="QrCode,Code128,Ean13,Code39"/>
+                            </zxing:CameraBarcodeReaderView.Options>
+                        </zxing:CameraBarcodeReaderView>
 
-                            <Button Grid.Column="1"
-                                    Clicked="OnToggleClicked"
-                                    CornerRadius="12"
-                                    TextColor="White"
-                                    FontAttributes="Bold">
-                                <Button.Triggers>
-                                    <DataTrigger TargetType="Button" Binding="{Binding IsDetecting}" Value="True">
-                                        <Setter Property="Text" Value="Pausar ⏸" />
-                                        <Setter Property="BackgroundColor" Value="#B91C1C" />
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Button" Binding="{Binding IsDetecting}" Value="False">
-                                        <Setter Property="Text" Value="Escanear ▶" />
-                                        <Setter Property="BackgroundColor" Value="#10B981" />
-                                    </DataTrigger>
-                                </Button.Triggers>
-                            </Button>
+                        <Grid>
+                            <Grid RowDefinitions="*, 2*, *" ColumnDefinitions="*, 2*, *" InputTransparent="True">
+                                <BoxView Grid.Row="0" Grid.ColumnSpan="3" BackgroundColor="#CC000000" />
+                                <BoxView Grid.Row="2" Grid.ColumnSpan="3" BackgroundColor="#CC000000" />
+                                <BoxView Grid.Row="1" Grid.Column="0" BackgroundColor="#CC000000" />
+                                <BoxView Grid.Row="1" Grid.Column="2" BackgroundColor="#CC000000" />
 
-                            <Button Grid.Column="2"
-                                    Text="Limpiar"
-                                    Clicked="OnClearClicked"
-                                    BackgroundColor="#374151"
-                                    TextColor="White"
-                                    CornerRadius="12"/>
+                                <Border x:Name="ScanContainer" Grid.Row="1" Grid.Column="1" Stroke="White" StrokeThickness="2" BackgroundColor="Transparent">
+                                    <Grid>
+                                        <BoxView x:Name="LaserLine" HeightRequest="2" Color="#EF4444" VerticalOptions="Start" HorizontalOptions="Fill" Opacity="0.8">
+                                            <BoxView.Shadow>
+                                                <Shadow Brush="#EF4444" Radius="10" Opacity="1"/>
+                                            </BoxView.Shadow>
+                                        </BoxView>
+
+                                        <BoxView x:Name="SuccessFlash" BackgroundColor="#10B981" Opacity="0"/>
+                                        <Label x:Name="SuccessLabel" Text="✓ LECTURA OK" TextColor="White" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" Scale="0.5"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <HorizontalStackLayout Grid.Row="2" HorizontalOptions="Center" VerticalOptions="End" Spacing="16" Margin="0,0,0,30">
+                                <Button Text="Cámara" Command="{Binding SwitchCameraCommand}" BackgroundColor="#374151" TextColor="White" HeightRequest="44" CornerRadius="22" Padding="20,0"/>
+
+                                <Button Clicked="OnToggleClicked" HeightRequest="44" CornerRadius="22" Padding="20,0" TextColor="White" FontAttributes="Bold">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding IsDetecting}" Value="True">
+                                            <Setter Property="Text" Value="Pausar" />
+                                            <Setter Property="BackgroundColor" Value="#B91C1C" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Button" Binding="{Binding IsDetecting}" Value="False">
+                                            <Setter Property="Text" Value="Escanear ▶" />
+                                            <Setter Property="BackgroundColor" Value="#10B981" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+
+                                <Button Text="Limpiar" Clicked="OnClearClicked" Style="{StaticResource SecondaryButtonStyle}" BackgroundColor="#80000000" TextColor="White" BorderColor="White" HeightRequest="44" CornerRadius="22"/>
+                            </HorizontalStackLayout>
                         </Grid>
                     </Grid>
-                </Grid>
-            </Frame>
+                </Frame>
+            </Grid>
         </Grid>
     </Grid>
 </ContentPage>

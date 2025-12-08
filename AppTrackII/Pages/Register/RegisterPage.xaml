@@ -3,52 +3,43 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AppTrackII.ViewModels"
-    x:Class="AppTrackII.Pages.Register.RegisterPage"
-    Title="">
+    x:Class="AppTrackII.Pages.Register.RegisterPage">
 
     <ContentPage.BindingContext>
         <vm:RegisterViewModel />
     </ContentPage.BindingContext>
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="24">
+    <Grid RowDefinitions="Auto, *">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Padding="10,10,24,10">
+            <Button Text="←" Command="{Binding CancelCommand}" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimaryColor}" WidthRequest="40"/>
+            <Label Grid.Column="1" Text="Nuevo Dispositivo" Style="{StaticResource TitleLabelStyle}" VerticalOptions="Center" HorizontalOptions="End"/>
+        </Grid>
 
-            <Label Grid.Row="0"
-               Text="Registrar dispositivo"
-               Style="{StaticResource TitleLabelStyle}"
-               HorizontalOptions="Center"
-               HorizontalTextAlignment="Center"
-               Margin="0,0,0,24" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="24" Padding="24,0,24,24">
 
+                <Frame>
+                    <VerticalStackLayout Spacing="16">
 
-            <Frame>
-                <VerticalStackLayout Spacing="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="ID FÍSICO (ANDROID ID)" FontSize="10" TextColor="{StaticResource TextSecondaryColor}"/>
+                            <Entry Text="{Binding AndroidId}" IsReadOnly="True" TextColor="{StaticResource TextSecondaryColor}" BackgroundColor="#F9FAFB"/>
+                        </VerticalStackLayout>
 
-                    <Label Text="Android ID"
-                           Style="{StaticResource SubtitleLabelStyle}" />
-                    <Entry Text="{Binding AndroidId}"
-                           IsReadOnly="True" />
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="UBICACIÓN" FontSize="10" TextColor="{StaticResource TextSecondaryColor}"/>
+                            <Picker ItemsSource="{Binding Localidades}" ItemDisplayBinding="{Binding Nombre}" SelectedItem="{Binding LocalidadSeleccionada}" Title="Seleccionar..." />
+                        </VerticalStackLayout>
 
-                    <Label Text="Localidad"
-                           Style="{StaticResource SubtitleLabelStyle}" />
-                    <Picker ItemsSource="{Binding Localidades}"
-                            ItemDisplayBinding="{Binding Nombre}"
-                            SelectedItem="{Binding LocalidadSeleccionada}"
-                            Title="Selecciona una localidad" />
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="NOMBRE ASIGNADO" FontSize="10" TextColor="{StaticResource TextSecondaryColor}"/>
+                            <Entry Placeholder="Ej: Tablet Recepción 01" Text="{Binding NombreDispositivo}" />
+                        </VerticalStackLayout>
 
-                    <Label Text="Nombre del dispositivo"
-                           Style="{StaticResource SubtitleLabelStyle}" />
-                    <Entry Placeholder="Ej: Tablet Línea 1"
-                           Text="{Binding NombreDispositivo}" />
-
-                    <Button Text="Registrar"
-                            Command="{Binding RegisterCommand}" />
-
-                    <Button Text="Cancelar"
-                            Style="{StaticResource SecondaryButtonStyle}"
-                            Command="{Binding CancelCommand}" />
-                </VerticalStackLayout>
-            </Frame>
-        </VerticalStackLayout>
-    </ScrollView>
+                        <Button Text="Guardar Configuración" Command="{Binding RegisterCommand}" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>
