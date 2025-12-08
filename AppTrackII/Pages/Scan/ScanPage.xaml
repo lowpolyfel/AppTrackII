@@ -3,7 +3,9 @@
     x:Class="AppTrackII.Pages.Scan.ScanPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:viewModels="clr-namespace:AppTrackII.ViewModels">
+    xmlns:viewModels="clr-namespace:AppTrackII.ViewModels"
+    xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.Maui.Controls"
+    xmlns:zxingCore="clr-namespace:ZXing.Net.Maui;assembly=ZXing.Net.Maui">
 
     <ContentPage.BindingContext>
         <viewModels:ScanViewModel />
@@ -18,14 +20,13 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- HEADER -->
         <Grid Grid.Row="0" Padding="0,0,0,24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Text="Escaneo"
+            <Label Text="Escaneo de Piezas"
                    Style="{StaticResource TitleLabelStyle}" />
 
             <StackLayout Grid.Column="1"
@@ -42,96 +43,151 @@
             </StackLayout>
         </Grid>
 
-        <!-- CONTENIDO -->
         <Grid Grid.Row="1" ColumnSpacing="24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
-            <!-- FORMULARIO -->
-            <Frame Grid.Column="0">
-                <VerticalStackLayout Spacing="16">
+            <Frame Grid.Column="0" BackgroundColor="{StaticResource SecondaryColor}">
+                <VerticalStackLayout Spacing="24">
 
-                    <Label Text="Datos de pieza"
+                    <Label Text="Datos de Pieza Escaneada"
                            Style="{StaticResource SubtitleLabelStyle}" />
 
                     <StackLayout Spacing="4">
-                        <Label Text="Número de Lote"
-                               Style="{StaticResource SubtitleLabelStyle}" />
-                        <Entry Text="{Binding Lote}"
-                               Placeholder="Escanea el número de lote" />
+                        <Label Text="Número de Lote" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}"/>
+                        <Border BackgroundColor="#F9FAFB" StrokeShape="RoundRectangle 8" Padding="12">
+                            <Label Text="{Binding Lote, TargetNullValue='Esperando escaneo...'}" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimaryColor}"/>
+                        </Border>
                     </StackLayout>
 
                     <StackLayout Spacing="4">
-                        <Label Text="Número de Parte"
-                               Style="{StaticResource SubtitleLabelStyle}" />
-                        <Entry Text="{Binding NumeroParte}"
-                               Placeholder="Escanea o captura el número de parte" />
+                        <Label Text="Número de Parte" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}"/>
+                        <Border BackgroundColor="#F9FAFB" StrokeShape="RoundRectangle 8" Padding="12">
+                            <Label Text="{Binding NumeroParte, TargetNullValue='Esperando escaneo...'}" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimaryColor}"/>
+                        </Border>
                     </StackLayout>
 
                     <StackLayout Spacing="4">
-                        <Label Text="Cantidad de Piezas"
-                               Style="{StaticResource SubtitleLabelStyle}" />
+                        <Label Text="Cantidad de Piezas" FontAttributes="Bold" TextColor="{StaticResource TextSecondaryColor}"/>
                         <Entry Text="{Binding CantidadPiezas}"
                                Keyboard="Numeric"
-                               Placeholder="CAPTURA la cantidad de piezas" />
+                               Placeholder="Ingrese cantidad manualmente" />
                     </StackLayout>
+
+                    <Button Text="Finalizar Captura" 
+                            BackgroundColor="{StaticResource PrimaryColor}" 
+                            TextColor="White"
+                            Margin="0,20,0,0"/>
 
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- CÁMARA -->
-            <Frame Grid.Column="1">
-                <Grid RowDefinitions="Auto,Auto,*,Auto"
-                      RowSpacing="16">
+            <Frame Grid.Column="1" Padding="0" IsClippedToBounds="True" CornerRadius="20" BackgroundColor="Black">
+                <Grid>
 
-                    <Label Grid.Row="0"
-                           Text="Cámara para escaneo"
-                           Style="{StaticResource SubtitleLabelStyle}" />
+                    <zxing:CameraBarcodeReaderView
+                        x:Name="barcodeView"
+                        IsDetecting="{Binding IsDetecting}"
+                        CameraLocation="{Binding CameraLocation}"
+                        BarcodesDetected="CameraBarcodeReaderView_BarcodesDetected">
+                        <zxing:CameraBarcodeReaderView.Options>
+                            <zxingCore:BarcodeReaderOptions 
+                                AutoRotate="True"
+                                TryHarder="True" 
+                                Formats="QrCode,Code128,Ean13,Code39"/>
+                        </zxing:CameraBarcodeReaderView.Options>
+                    </zxing:CameraBarcodeReaderView>
 
-                    <Frame Grid.Row="1"
-                           BackgroundColor="{StaticResource ErrorBackgroundColor}"
-                           BorderColor="{StaticResource ErrorBackgroundColor}"
-                           CornerRadius="14"
-                           HasShadow="False"
-                           Padding="10">
-                        <Label Text="{Binding CameraStatusMessage}"
-                               FontSize="13"
-                               TextColor="{StaticResource ErrorTextColor}" />
-                    </Frame>
+                    <Grid>
 
-                    <Grid Grid.Row="2">
-                        <Border StrokeThickness="1"
-                                Stroke="{StaticResource BorderColor}"
-                                StrokeShape="RoundRectangle 20">
-                            <Grid>
-                                <Label Text="Vista de cámara"
-                                       FontSize="14"
-                                       TextColor="{StaticResource TextSecondaryColor}"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center" />
-                            </Grid>
-                        </Border>
-                    </Grid>
+                        <Grid RowDefinitions="*, 2*, *" ColumnDefinitions="*, 2*, *" InputTransparent="True">
+                            <BoxView Grid.Row="0" Grid.ColumnSpan="3" BackgroundColor="#AA000000" />
+                            <BoxView Grid.Row="2" Grid.ColumnSpan="3" BackgroundColor="#AA000000" />
+                            <BoxView Grid.Row="1" Grid.Column="0" BackgroundColor="#AA000000" />
+                            <BoxView Grid.Row="1" Grid.Column="2" BackgroundColor="#AA000000" />
 
-                    <Grid Grid.Row="3"
-                          ColumnDefinitions="*,Auto,Auto"
-                          ColumnSpacing="12">
+                            <Border x:Name="ScanContainer"
+                                    Grid.Row="1" Grid.Column="1"
+                                    Stroke="White"
+                                    StrokeThickness="3"
+                                    StrokeShape="RoundRectangle 20"
+                                    BackgroundColor="Transparent">
 
-                        <Picker Grid.Column="0"
-                                ItemsSource="{Binding Cameras}"
-                                SelectedItem="{Binding SelectedCamera}"
-                                Title="Selecciona cámara" />
+                                <Grid>
+                                    <BoxView x:Name="LaserLine"
+                                             HeightRequest="2"
+                                             Color="#EF4444" 
+                                             VerticalOptions="Start"
+                                             HorizontalOptions="Fill"
+                                             Opacity="0.8">
+                                        <BoxView.Shadow>
+                                            <Shadow Brush="#EF4444" Radius="10" Opacity="1"/>
+                                        </BoxView.Shadow>
+                                    </BoxView>
 
-                        <Button Grid.Column="1"
-                                Text="Iniciar"
-                                Command="{Binding StartScanCommand}" />
+                                    <BoxView x:Name="SuccessFlash"
+                                             BackgroundColor="#10B981"
+                                             Opacity="0"
+                                             HorizontalOptions="Fill"
+                                             VerticalOptions="Fill"/>
 
-                        <Button Grid.Column="2"
-                                Text="Detener"
-                                Command="{Binding StopScanCommand}"
-                                BackgroundColor="{StaticResource TextPrimaryColor}" />
+                                    <Label x:Name="SuccessLabel"
+                                           Text="✓ LECTURA OK"
+                                           TextColor="White"
+                                           FontSize="22"
+                                           FontAttributes="Bold"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           Opacity="0"
+                                           Scale="0.5"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <Grid VerticalOptions="End" 
+                              ColumnDefinitions="*,*,*" 
+                              ColumnSpacing="10" 
+                              Padding="20">
+
+                            <Button Grid.Column="0"
+                                    Text="Cámara"
+                                    Command="{Binding SwitchCameraCommand}"
+                                    BackgroundColor="#374151"
+                                    TextColor="White"
+                                    CornerRadius="12"/>
+
+                            <Button Grid.Column="1"
+                                    Clicked="OnToggleClicked"
+                                    CornerRadius="12"
+                                    TextColor="White"
+                                    FontAttributes="Bold">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsDetecting}" Value="True">
+                                        <Setter Property="Text" Value="Pausar ⏸" />
+                                        <Setter Property="BackgroundColor" Value="#B91C1C" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsDetecting}" Value="False">
+                                        <Setter Property="Text" Value="Escanear ▶" />
+                                        <Setter Property="BackgroundColor" Value="#10B981" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+
+                            <Button Grid.Column="2"
+                                    Text="Limpiar"
+                                    Clicked="OnClearClicked"
+                                    BackgroundColor="#374151"
+                                    TextColor="White"
+                                    CornerRadius="12"/>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Frame>

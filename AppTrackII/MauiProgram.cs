@@ -5,7 +5,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 using AppTrackII.Pages.Scan;
-
+using ZXing.Net.Maui.Controls; // Importante
 
 namespace AppTrackII
 {
@@ -17,6 +17,7 @@ namespace AppTrackII
 
             builder
                 .UseMauiApp<App>()
+                .UseBarcodeReader() // Inicializar ZXing
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -35,5 +36,4 @@ namespace AppTrackII
             return builder.Build();
         }
     }
-
 }
