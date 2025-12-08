@@ -1,16 +1,19 @@
-﻿using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
 using ZXing.Net.Maui; // Necesario para CameraLocation
+using AppTrackII.Pages.Scrap;      // Para la navegación
+using AppTrackII.Pages.Retrabajo;  // Para la navegación
 
 namespace AppTrackII.ViewModels
 {
     public class ScanViewModel : BaseViewModel
     {
+        // Datos del dispositivo (Simulados por ahora, luego vendrán de API/Storage)
         public string DeviceName { get; set; } = "Scanner Pro";
         public string DeviceLocalidad { get; set; } = "Almacén Central";
 
+        // Campos de captura
         private string _lote = string.Empty;
         public string Lote
         {
@@ -25,9 +28,14 @@ namespace AppTrackII.ViewModels
             set { _numeroParte = value; OnPropertyChanged(); }
         }
 
-        public string CantidadPiezas { get; set; } = string.Empty;
+        private string _cantidadPiezas = string.Empty;
+        public string CantidadPiezas
+        {
+            get => _cantidadPiezas;
+            set { _cantidadPiezas = value; OnPropertyChanged(); }
+        }
 
-        // Propiedad para controlar si la cámara está detectando
+        // Control de Cámara
         private bool _isDetecting = true;
         public bool IsDetecting
         {
@@ -35,7 +43,6 @@ namespace AppTrackII.ViewModels
             set { _isDetecting = value; OnPropertyChanged(); }
         }
 
-        // Selección de cámara usando el Enum de ZXing
         private CameraLocation _cameraLocation = CameraLocation.Rear;
         public CameraLocation CameraLocation
         {
@@ -43,20 +50,26 @@ namespace AppTrackII.ViewModels
             set { _cameraLocation = value; OnPropertyChanged(); }
         }
 
-        private string _cameraStatusMessage = "Apunta al código para escanear.";
+        private string _cameraStatusMessage = "Listo para escanear";
         public string CameraStatusMessage
         {
             get => _cameraStatusMessage;
             set { _cameraStatusMessage = value; OnPropertyChanged(); }
         }
 
+        // Comandos
         public ICommand StartScanCommand { get; }
         public ICommand StopScanCommand { get; }
         public ICommand SwitchCameraCommand { get; }
         public ICommand BarcodeDetectedCommand { get; }
 
+        // Comandos de Navegación
+        public ICommand GoToScrapCommand { get; }
+        public ICommand GoToRetrabajoCommand { get; }
+
         public ScanViewModel()
         {
+            // Control de escaneo
             StartScanCommand = new Command(() =>
             {
                 IsDetecting = true;
@@ -75,59 +88,67 @@ namespace AppTrackII.ViewModels
                 CameraStatusMessage = $"Cámara {(CameraLocation == CameraLocation.Rear ? "Trasera" : "Frontal")}";
             });
 
+            // Lógica al detectar código
             BarcodeDetectedCommand = new Command<BarcodeResult>(OnBarcodeDetected);
+
+            // Navegación
+            GoToScrapCommand = new Command(async () =>
+            {
+                await Shell.Current.GoToAsync(nameof(ScrapPage));
+            });
+
+            GoToRetrabajoCommand = new Command(async () =>
+            {
+                await Shell.Current.GoToAsync(nameof(RetrabajoPage));
+            });
         }
 
         public Task InitializeAsync()
         {
+            // Reiniciar estado al entrar
             IsDetecting = true;
             return Task.CompletedTask;
         }
 
         private void OnBarcodeDetected(BarcodeResult result)
         {
-            // Ejecutar en el hilo principal para actualizar UI
+            // Ejecutar en hilo principal para actualizar UI
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                // Evitar lecturas múltiples muy rápidas
                 if (!IsDetecting) return;
 
-                // Feedback háptico (vibración corta) para confirmar lectura
+                // Feedback háptico (vibración)
                 try { HapticFeedback.Perform(HapticFeedbackType.Click); } catch { }
 
-                var format = result.Format;
                 var value = result.Value;
 
-                // Lógica simple para determinar dónde poner el valor
-                // Por ejemplo, si empieza con 'L', es Lote, si empieza con 'P', es Parte (ejemplo hipotético)
-                // Aquí simplemente llenamos Lote primero, si está vacío.
-
+                // Lógica simple de llenado (primero Lote, luego Parte)
                 if (string.IsNullOrEmpty(Lote))
                 {
                     Lote = value;
-                    CameraStatusMessage = $"Lote detectado: {format}";
-                    // Pausa breve para no re-escanear inmediatamente lo mismo
+                    CameraStatusMessage = "Lote capturado";
                     await PauseScanningBriefly();
                 }
                 else if (string.IsNullOrEmpty(NumeroParte))
                 {
                     NumeroParte = value;
-                    CameraStatusMessage = $"Parte detectada: {format}";
+                    CameraStatusMessage = "No. Parte capturado";
                     await PauseScanningBriefly();
                 }
                 else
                 {
-                    CameraStatusMessage = $"Lectura: {value} ({format})";
+                    CameraStatusMessage = $"Lectura: {value}";
                 }
             });
         }
 
         private async Task PauseScanningBriefly()
         {
+            // Pequeña pausa para no leer el mismo código múltiples veces seguidas
             IsDetecting = false;
-            await Task.Delay(1500); // Esperar 1.5 segundos
+            await Task.Delay(1500);
             IsDetecting = true;
-            CameraStatusMessage = "Listo para siguiente escaneo...";
+            CameraStatusMessage = "Listo para siguiente...";
         }
     }
 }
