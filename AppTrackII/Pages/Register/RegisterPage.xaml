@@ -13,8 +13,13 @@
     <ScrollView>
         <VerticalStackLayout Spacing="24">
 
-            <Label Text="Registrar dispositivo"
-                   Style="{StaticResource TitleLabelStyle}" />
+            <Label Grid.Row="0"
+               Text="Registrar dispositivo"
+               Style="{StaticResource TitleLabelStyle}"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center"
+               Margin="0,0,0,24" />
+
 
             <Frame>
                 <VerticalStackLayout Spacing="12">

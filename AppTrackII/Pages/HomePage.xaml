@@ -13,9 +13,12 @@
     <Grid RowDefinitions="Auto,*">
         <!-- Encabezado minimal -->
         <Grid Grid.Row="0" Padding="0,0,0,24">
-            <Label Text="TrackII · Panel móvil"
-                   FontSize="13"
-                   TextColor="{StaticResource TextSecondaryColor}" />
+            <Label Grid.Row="0"
+           Text="AppTrackII"
+           Style="{StaticResource TitleLabelStyle}"
+           HorizontalOptions="Center"
+           HorizontalTextAlignment="Center"
+           Margin="0,0,0,24" />
         </Grid>
 
         <!-- Contenido central -->

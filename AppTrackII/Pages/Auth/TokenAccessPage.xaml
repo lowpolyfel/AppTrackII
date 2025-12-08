@@ -13,8 +13,11 @@
     <Grid RowDefinitions="Auto,*">
 
         <Label Grid.Row="0"
-               Text="Registro de dispositivo"
-               Style="{StaticResource TitleLabelStyle}" />
+           Text="Registro de dispositivo"
+           Style="{StaticResource TitleLabelStyle}"
+           HorizontalOptions="Center"
+           HorizontalTextAlignment="Center"
+           Margin="0,0,0,24" />
 
         <VerticalStackLayout Grid.Row="1"
                              VerticalOptions="Center"
