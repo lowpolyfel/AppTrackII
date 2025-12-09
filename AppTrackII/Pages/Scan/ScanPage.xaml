@@ -21,16 +21,29 @@
                     <Label Text="{Binding CameraStatusMessage}" FontSize="12" TextColor="{StaticResource TextSecondaryColor}"/>
                 </VerticalStackLayout>
 
-                <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="0">
-                    <Label Text="{Binding DeviceName}" 
-                           FontSize="14" FontAttributes="Bold" 
-                           TextColor="{StaticResource PrimaryColor}" 
-                           HorizontalTextAlignment="End"/>
-                    <Label Text="{Binding DeviceLocalidad}" 
-                           FontSize="12" 
-                           TextColor="{StaticResource TextSecondaryColor}" 
-                           HorizontalTextAlignment="End"/>
-                </VerticalStackLayout>
+<StackLayout Grid.Column="1"
+             HorizontalOptions="End"
+             Spacing="2">
+
+    <!-- Usuario -->
+    <Label Text="{Binding Username}"
+           FontSize="14"
+           FontAttributes="Bold"
+           HorizontalTextAlignment="End" />
+
+    <!-- Localidad -->
+    <Label Text="{Binding DeviceLocalidad}"
+           FontSize="14"
+           TextColor="{StaticResource TextSecondaryColor}"
+           HorizontalTextAlignment="End" />
+
+    <!-- Nombre del dispositivo -->
+    <Label Text="{Binding DeviceName}"
+           FontSize="16"
+           FontAttributes="Bold"
+           HorizontalTextAlignment="End" />
+</StackLayout>
+
             </Grid>
         </Frame>
 

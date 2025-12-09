@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls;
+﻿using AppTrackII.Pages.Scan;
+using Microsoft.Maui.Controls;
 
 namespace AppTrackII;
 
@@ -8,5 +9,7 @@ public partial class App : Application
     {
         InitializeComponent();
         MainPage = new AppShell();
+        Routing.RegisterRoute(nameof(ScanPage), typeof(ScanPage));
+
     }
 }

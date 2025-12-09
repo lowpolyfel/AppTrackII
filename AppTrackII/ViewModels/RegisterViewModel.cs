@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 using AppTrackII.Models;
 using AppTrackII.Services;
 
@@ -14,6 +16,7 @@ namespace AppTrackII.ViewModels
     public class RegisterViewModel : BaseViewModel
     {
         private readonly ILocalidadService _localidadService;
+        private readonly ApiClient _apiClient = new();
 
         public ObservableCollection<Localidad> Localidades { get; } = new();
 
@@ -21,7 +24,7 @@ namespace AppTrackII.ViewModels
         public Localidad? LocalidadSeleccionada
         {
             get => _localidadSeleccionada;
-            set { _localidadSeleccionada = value; OnPropertyChanged(); }
+            set => SetProperty(ref _localidadSeleccionada, value);
         }
 
         public string AndroidId { get; private set; } = string.Empty;
@@ -30,7 +33,7 @@ namespace AppTrackII.ViewModels
         public string NombreDispositivo
         {
             get => _nombreDispositivo;
-            set { _nombreDispositivo = value; OnPropertyChanged(); }
+            set => SetProperty(ref _nombreDispositivo, value);
         }
 
         public ICommand RegisterCommand { get; }
@@ -38,8 +41,7 @@ namespace AppTrackII.ViewModels
 
         public RegisterViewModel()
         {
-            // Por ahora usamos el servicio "mock" que simula la BD.
-            _localidadService = new MockLocalidadService();
+            _localidadService = new ApiLocalidadService();
 
             LoadAndroidId();
             _ = LoadLocalidadesAsync();
@@ -54,12 +56,23 @@ namespace AppTrackII.ViewModels
         private async Task LoadLocalidadesAsync()
         {
             Localidades.Clear();
-            var items = await _localidadService.GetLocalidadesAsync();
 
-            foreach (var loc in items)
-                Localidades.Add(loc);
+            try
+            {
+                var items = await _localidadService.GetLocalidadesAsync();
 
-            LocalidadSeleccionada = Localidades.Count > 0 ? Localidades[0] : null;
+                foreach (var loc in items)
+                    Localidades.Add(loc);
+
+                LocalidadSeleccionada = Localidades.Count > 0 ? Localidades[0] : null;
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Error",
+                    $"No se pudieron cargar las localidades:\n{ex.Message}",
+                    "OK");
+            }
         }
 
         private void LoadAndroidId()
@@ -91,17 +104,77 @@ namespace AppTrackII.ViewModels
                 return;
             }
 
-            // TODO: Enviar a la API de TrackII:
-            // AndroidId, LocalidadSeleccionada.Id, NombreDispositivo, etc.
+            var accessToken = Preferences.Get("AccessToken", string.Empty);
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Error",
+                    "Falta el token de acceso. Vuelve a la pantalla anterior e ingrésalo.",
+                    "OK");
+                return;
+            }
 
-            await Application.Current.MainPage.DisplayAlert(
-                "Registro exitoso",
-                $"Dispositivo: {NombreDispositivo}\n" +
-                $"Localidad: {LocalidadSeleccionada.Nombre}\n" +
-                $"AndroidID: {AndroidId}",
-                "OK");
+            var body = new
+            {
+                Token = accessToken,
+                AndroidId = this.AndroidId,
+                NombreDispositivo = this.NombreDispositivo,
+                LocalidadId = LocalidadSeleccionada.Id
+            };
 
-            await Shell.Current.GoToAsync("//HomePage");
+            try
+            {
+                var result = await _apiClient.PostAsync<RegisterDeviceResponse>("register-device", body);
+
+                if (result == null)
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Error", "No se pudo conectar con el servidor.", "OK");
+                    return;
+                }
+
+                if (!result.Ok)
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Registro fallido",
+                        result.Error ?? "No fue posible registrar el dispositivo.",
+                        "OK");
+                    return;
+                }
+
+                // Guardamos información de dispositivo para futuras llamadas
+                if (!string.IsNullOrWhiteSpace(result.DeviceToken))
+                    Preferences.Set("DeviceToken", result.DeviceToken);
+
+                Preferences.Set("DeviceName", NombreDispositivo);
+                Preferences.Set("LocalidadId", result.LocalidadId ?? LocalidadSeleccionada.Id);
+                Preferences.Set("LocalidadNombre", LocalidadSeleccionada.Nombre);
+
+                await Application.Current.MainPage.DisplayAlert(
+                    "Registro exitoso",
+                    $"Dispositivo: {NombreDispositivo}\n" +
+                    $"Localidad: {LocalidadSeleccionada.Nombre}\n" +
+                    $"AndroidID: {AndroidId}",
+                    "OK");
+
+                // Volver al Home para que el usuario pueda iniciar sesión
+                await Shell.Current.GoToAsync("//HomePage");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Error",
+                    $"Ocurrió un error al registrar el dispositivo:\n{ex.Message}",
+                    "OK");
+            }
+        }
+
+        private class RegisterDeviceResponse
+        {
+            public bool Ok { get; set; }
+            public string? Error { get; set; }
+            public string? DeviceToken { get; set; }
+            public int? LocalidadId { get; set; }
         }
     }
 }
