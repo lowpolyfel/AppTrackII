@@ -138,4 +138,26 @@ public static class ApiClient
             Encoding.UTF8,
             "application/json");
     }
+
+    public static async Task<Models.ProductInfo?> GetProductInfoAsync(string partNumber)
+    {
+        try
+        {
+            var encoded = System.Net.WebUtility.UrlEncode(partNumber);
+            var response = await Client.GetAsync($"api/v1/scan/product/{encoded}");
+
+            if (!response.IsSuccessStatusCode) return null;
+
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<Models.ProductInfo>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
 }

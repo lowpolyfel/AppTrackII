@@ -8,10 +8,18 @@ public class BaseViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    // --- ESTO ES LO QUE FALTABA ---
+    private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => SetProperty(ref _isBusy, value);
+    }
+    // -----------------------------
+
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    // 👇 Este método es el que usa LoginViewModel (SetProperty)
     protected bool SetProperty<T>(ref T backingStore, T value,
         [CallerMemberName] string? propertyName = null)
     {

@@ -1,164 +1,143 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
+﻿using System.Windows.Input;
 using AppTrackII.Services;
+using AppTrackII.Models; // Asegúrate de tener el modelo ProductInfo
+using ZXing.Net.Maui;    // Necesario para BarcodeDetectionEventArgs
 
-namespace AppTrackII.ViewModels
+namespace AppTrackII.ViewModels;
+
+public class ScanViewModel : BaseViewModel
 {
-    public class ScanViewModel : BaseViewModel
+    // PROPIEDADES DE TEXTO
+    private string _ordenTrabajo = string.Empty;
+    public string OrdenTrabajo
     {
-        // ======= CONTEXTO USUARIO / DISPOSITIVO =======
+        get => _ordenTrabajo;
+        set => SetProperty(ref _ordenTrabajo, value);
+    }
 
-        private string _username = string.Empty;
-        public string Username
+    private string _numeroParte = string.Empty;
+    public string NumeroParte
+    {
+        get => _numeroParte;
+        set => SetProperty(ref _numeroParte, value);
+    }
+
+    // PROPIEDADES DE INFORMACIÓN (Familia, Area, etc)
+    private string _familia = string.Empty;
+    public string Familia
+    {
+        get => _familia;
+        set => SetProperty(ref _familia, value);
+    }
+
+    private string _subFamilia = string.Empty;
+    public string SubFamilia
+    {
+        get => _subFamilia;
+        set => SetProperty(ref _subFamilia, value);
+    }
+
+    private string _area = string.Empty;
+    public string Area
+    {
+        get => _area;
+        set => SetProperty(ref _area, value);
+    }
+
+    // CONTROL DEL ESCÁNER
+    private bool _isScanning = true;
+    public bool IsScanning
+    {
+        get => _isScanning;
+        set => SetProperty(ref _isScanning, value);
+    }
+
+    // COMANDOS
+    public ICommand BarcodeDetectedCommand { get; }
+    public ICommand ClearCommand { get; }
+
+    public ScanViewModel()
+    {
+        BarcodeDetectedCommand = new Command<BarcodeDetectionEventArgs>(OnBarcodeDetected);
+        ClearCommand = new Command(Limpiar);
+    }
+
+    private void OnBarcodeDetected(BarcodeDetectionEventArgs args)
+    {
+        if (args == null || !args.Results.Any()) return;
+
+        var result = args.Results.FirstOrDefault();
+        if (result == null) return;
+
+        var texto = result.Value;
+
+        // IMPORTANTE: Volver al hilo principal para evitar CRASH
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
-            get => _username;
-            set => SetProperty(ref _username, value);
+            IsScanning = false; // Pausar escáner
+            await ProcesarTexto(texto);
+            IsScanning = true;  // Reactivar escáner
+        });
+    }
+
+    private async Task ProcesarTexto(string texto)
+    {
+        if (string.IsNullOrWhiteSpace(texto)) return;
+
+        // LÓGICA: Si son 7 números es Orden, si no, es Parte
+        bool esOrden = texto.Length == 7 && long.TryParse(texto, out _);
+
+        if (esOrden)
+        {
+            OrdenTrabajo = texto;
+            try { HapticFeedback.Perform(HapticFeedbackType.Click); } catch { }
         }
-
-        private string _deviceName = "Dispositivo";
-        public string DeviceName
+        else
         {
-            get => _deviceName;
-            set => SetProperty(ref _deviceName, value);
+            NumeroParte = texto;
+            try { HapticFeedback.Perform(HapticFeedbackType.Click); } catch { }
+            await BuscarInfoProducto(texto);
         }
+    }
 
-        private string _deviceLocalidad = "Sin localidad";
-        public string DeviceLocalidad
+    private async Task BuscarInfoProducto(string partNumber)
+    {
+        IsBusy = true; // Requiere que BaseViewModel tenga IsBusy
+        try
         {
-            get => _deviceLocalidad;
-            set => SetProperty(ref _deviceLocalidad, value);
-        }
+            // Llama a tu API
+            var info = await ApiClient.GetProductInfoAsync(partNumber);
 
-        private uint _deviceId;
-
-        // ======= CAMPOS DE ESCANEO =======
-
-        private string _lote = string.Empty;
-        public string Lote
-        {
-            get => _lote;
-            set => SetProperty(ref _lote, value);
-        }
-
-        private string _numeroParte = string.Empty;
-        public string NumeroParte
-        {
-            get => _numeroParte;
-            set => SetProperty(ref _numeroParte, value);
-        }
-
-        private int _cantidadPiezas;
-        public int CantidadPiezas
-        {
-            get => _cantidadPiezas;
-            set => SetProperty(ref _cantidadPiezas, value);
-        }
-
-        // ======= CÁMARAS / ESTADO =======
-
-        public ObservableCollection<string> Cameras { get; } = new();
-
-        private string? _selectedCamera;
-        public string? SelectedCamera
-        {
-            get => _selectedCamera;
-            set => SetProperty(ref _selectedCamera, value);
-        }
-
-        private string _cameraStatusMessage = "Selecciona una cámara y presiona Iniciar.";
-        public string CameraStatusMessage
-        {
-            get => _cameraStatusMessage;
-            set => SetProperty(ref _cameraStatusMessage, value);
-        }
-
-        private bool _isDetecting;
-        public bool IsDetecting
-        {
-            get => _isDetecting;
-            set => SetProperty(ref _isDetecting, value);
-        }
-
-        // ======= COMANDOS =======
-
-        public ICommand StartScanCommand { get; }
-        public ICommand StopScanCommand { get; }
-        public ICommand BarcodeDetectedCommand { get; }
-
-        public ScanViewModel()
-        {
-            StartScanCommand = new Command(StartScan);
-            StopScanCommand = new Command(StopScan);
-            BarcodeDetectedCommand = new Command<string>(OnBarcodeDetected);
-
-            LoadMockCameras();
-        }
-
-        // Se llama desde ScanPage.OnAppearing()
-        public Task InitializeAsync()
-        {
-            Username = Preferences.Get("Usuario", string.Empty);
-            DeviceName = Preferences.Get("DeviceName", "Dispositivo");
-            DeviceLocalidad = Preferences.Get("LocalidadNombre", "Sin localidad");
-            _deviceId = (uint)Preferences.Get("DeviceId", 0);
-
-            return Task.CompletedTask;
-        }
-
-        // ======= LÓGICA DE CÁMARA / ESCANEO =======
-
-        private void LoadMockCameras()
-        {
-            Cameras.Clear();
-            Cameras.Add("Cámara trasera");
-            Cameras.Add("Cámara frontal");
-            SelectedCamera = Cameras.FirstOrDefault();
-        }
-
-        private void StartScan()
-        {
-            if (SelectedCamera == null)
+            if (info != null)
             {
-                CameraStatusMessage = "Selecciona una cámara antes de iniciar.";
-                return;
-            }
-
-            IsDetecting = true;
-            CameraStatusMessage = $"Escaneando con {SelectedCamera}...";
-        }
-
-        private void StopScan()
-        {
-            IsDetecting = false;
-            CameraStatusMessage = "Escaneo detenido.";
-        }
-
-        private void OnBarcodeDetected(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return;
-
-            value = value.Trim();
-
-            // ======= REGLA TRACKII =======
-            // Lote: exactamente 7 dígitos numéricos
-            if (value.Length == 7 && value.All(char.IsDigit))
-            {
-                Lote = value;
-                CameraStatusMessage = $"Lote detectado: {value}";
+                Familia = info.Family;
+                SubFamilia = info.SubFamily;
+                Area = info.Area;
             }
             else
             {
-                NumeroParte = value;
-                CameraStatusMessage = $"No. Parte detectado: {value}";
+                Familia = "No encontrado";
+                SubFamilia = "-";
+                Area = "-";
             }
-
-            IsDetecting = false;
         }
+        catch (Exception)
+        {
+            Familia = "Error Red";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void Limpiar()
+    {
+        OrdenTrabajo = string.Empty;
+        NumeroParte = string.Empty;
+        Familia = string.Empty;
+        SubFamilia = string.Empty;
+        Area = string.Empty;
+        IsScanning = true;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using AppTrackII.Pages.Register;
 using AppTrackII.Services;
-using IntelliJ.Lang.Annotations;
 using Microsoft.Maui.Controls;
 using System.Windows.Input;
+// SE ELIMINÓ LA LÍNEA DE "IntelliJ" QUE CAUSABA EL ERROR
 
 namespace AppTrackII.ViewModels;
 
@@ -41,16 +41,14 @@ public class LoginViewModel : BaseViewModel
             return;
         }
 
-        IsBusy = true; // Ahora funcionará porque está definido en BaseViewModel
+        IsBusy = true;
         try
         {
-            // Llamada al API de Traka
             var token = await ApiClient.LoginAsync(Username, Password);
 
             if (!string.IsNullOrWhiteSpace(token))
             {
                 Preferences.Set("Username", Username);
-                // Navegación a la página principal
                 await Shell.Current.GoToAsync("//ScanPage");
             }
             else

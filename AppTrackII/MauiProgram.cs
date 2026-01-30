@@ -1,15 +1,15 @@
 ﻿using AppTrackII.Pages;
 using AppTrackII.Pages.Auth;
-using AppTrackII.Pages.Retrabajo;  // Nuevo
+using AppTrackII.Pages.Register; // <--- FALTABA ESTO
+using AppTrackII.Pages.Retrabajo;
 using AppTrackII.Pages.Scan;
-using AppTrackII.Pages.Scrap;      // Nuevo
+using AppTrackII.Pages.Scrap;
 using AppTrackII.Services;
 using AppTrackII.ViewModels;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 using ZXing.Net.Maui.Controls;
-
 
 namespace AppTrackII
 {
@@ -28,22 +28,23 @@ namespace AppTrackII
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // Servicios
+            // --- Servicios Registrados ---
+
             // Auth
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<LoginPage>();
 
+            // Registro (ESTO FALTABA)
+            builder.Services.AddTransient<RegisterViewModel>();
+            builder.Services.AddTransient<RegisterPage>();
+
             // ViewModels existentes
             builder.Services.AddTransient<ScanViewModel>();
-
-            // ViewModels Nuevos
             builder.Services.AddTransient<ScrapViewModel>();
             builder.Services.AddTransient<RetrabajoViewModel>();
 
             // Pages existentes
             builder.Services.AddTransient<ScanPage>();
-
-            // Pages Nuevas
             builder.Services.AddTransient<ScrapPage>();
             builder.Services.AddTransient<RetrabajoPage>();
 
