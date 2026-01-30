@@ -1,12 +1,15 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using AppTrackII.Config; // Asegúrate de usar tu ApiConfig para la URL
 
 namespace AppTrackII.Services;
 
 public static class ApiClient
 {
-    private static readonly string BaseUrl = "http://192.168.0.8:5000/";
+    // Usamos la configuración centralizada para evitar errores de IP
+    private static readonly string BaseUrl = ApiConfig.BaseUrl;
+
     private static HttpClient? _client;
 
     public static HttpClient Client
@@ -73,13 +76,14 @@ public static class ApiClient
     }
 
     // ======================
-    // REGISTER (Variante B)
+    // REGISTER (Actualizado con LocationId)
     // ======================
     public static async Task<(uint userId, uint deviceId, string username)?> RegisterAsync(
         string token,
         string deviceUid,
         string? deviceName,
-        string password)
+        string password,
+        uint locationId) // <--- NUEVO PARAMETRO
     {
         var response = await Client.PostAsync(
             "api/v1/register",
@@ -88,7 +92,8 @@ public static class ApiClient
                 token = token,
                 deviceUid = deviceUid,
                 deviceName = deviceName,
-                password = password
+                password = password,
+                locationId = locationId // <--- ENVIAR AL API
             }));
 
         if (!response.IsSuccessStatusCode)

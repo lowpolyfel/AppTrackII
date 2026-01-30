@@ -1,102 +1,75 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
-using AppTrackII.Pages.Scan;
+﻿using AppTrackII.Pages.Register;
 using AppTrackII.Services;
+using IntelliJ.Lang.Annotations;
+using Microsoft.Maui.Controls;
+using System.Windows.Input;
 
 namespace AppTrackII.ViewModels;
 
 public class LoginViewModel : BaseViewModel
 {
-    private string _usuario = string.Empty;
-    private string _password = string.Empty;
-    private bool _isBusy;
-
-    public string Usuario
+    private string _username = string.Empty;
+    public string Username
     {
-        get => _usuario;
-        set => SetProperty(ref _usuario, value);
+        get => _username;
+        set => SetProperty(ref _username, value);
     }
 
+    private string _password = string.Empty;
     public string Password
     {
         get => _password;
         set => SetProperty(ref _password, value);
     }
 
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set
-        {
-            if (SetProperty(ref _isBusy, value))
-            {
-                ((Command)LoginCommand).ChangeCanExecute();
-            }
-        }
-    }
-
     public ICommand LoginCommand { get; }
-    public ICommand CancelCommand { get; }
+    public ICommand GoToRegisterCommand { get; }
 
     public LoginViewModel()
     {
-        LoginCommand = new Command(async () => await DoLoginAsync(), () => !IsBusy);
-        CancelCommand = new Command(async () =>
-        {
-            await Shell.Current.GoToAsync("..");
-        });
+        LoginCommand = new Command(async () => await LoginAsync());
+        GoToRegisterCommand = new Command(async () => await GoToRegisterAsync());
     }
 
-    private async Task DoLoginAsync()
+    private async Task LoginAsync()
     {
         if (IsBusy) return;
-        IsBusy = true;
 
+        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Introduce usuario y contraseña", "OK");
+            return;
+        }
+
+        IsBusy = true; // Ahora funcionará porque está definido en BaseViewModel
         try
         {
-            if (string.IsNullOrWhiteSpace(Usuario) ||
-                string.IsNullOrWhiteSpace(Password))
+            // Llamada al API de Traka
+            var token = await ApiClient.LoginAsync(Username, Password);
+
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                await Application.Current.MainPage.DisplayAlert(
-                    "Error", "Usuario y contraseña son requeridos.", "OK");
-                return;
+                Preferences.Set("Username", Username);
+                // Navegación a la página principal
+                await Shell.Current.GoToAsync("//ScanPage");
             }
-
-            // Login REAL contra Trackii.Web
-            var token = await ApiClient.LoginAsync(Usuario, Password);
-
-            if (string.IsNullOrWhiteSpace(token))
+            else
             {
-                await Application.Current.MainPage.DisplayAlert(
-                    "Login fallido",
-                    "Credenciales inválidas o error de conexión.",
-                    "OK");
-                return;
+                await Application.Current.MainPage.DisplayAlert("Error", "Credenciales incorrectas", "OK");
             }
-
-            // Guardar datos mínimos (lo demás se obtiene vía API)
-            Preferences.Set("Usuario", Usuario);
-
-            await Application.Current.MainPage.DisplayAlert(
-                "Bienvenido",
-                $"Usuario: {Usuario}",
-                "OK");
-
-            await Shell.Current.GoToAsync(nameof(ScanPage));
         }
         catch (Exception ex)
         {
-            await Application.Current.MainPage.DisplayAlert(
-                "Error",
-                $"Ocurrió un error al hacer login:\n{ex.Message}",
-                "OK");
+            await Application.Current.MainPage.DisplayAlert("Error", $"No se pudo conectar: {ex.Message}", "OK");
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    private async Task GoToRegisterAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(RegisterPage));
     }
 }

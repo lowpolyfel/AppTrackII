@@ -1,8 +1,5 @@
 ﻿using AppTrackII.Pages.Auth;
 using AppTrackII.Pages.Register;
-using AppTrackII.Pages.Scan;
-using AppTrackII.Pages.Scrap;      // Nuevo namespace
-using AppTrackII.Pages.Retrabajo;  // Nuevo namespace
 
 namespace AppTrackII;
 
@@ -12,13 +9,13 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
 
-        Routing.RegisterRoute(nameof(TokenAccessPage), typeof(TokenAccessPage));
-        Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
-        Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
-        Routing.RegisterRoute(nameof(ScanPage), typeof(ScanPage));
+        // Registramos las rutas de las páginas que NO están en el TabBar
+        // Para poder navegar a ellas con Shell.Current.GoToAsync("NombreRuta")
 
-        // Nuevas rutas
-        Routing.RegisterRoute(nameof(ScrapPage), typeof(ScrapPage));
-        Routing.RegisterRoute(nameof(RetrabajoPage), typeof(RetrabajoPage));
+        Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
+        Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
+
+        // OJO: NO registres aquí ScanPage, ScrapPage o RetrabajoPage 
+        // porque ya están definidas con "Route=" en el AppShell.xaml
     }
 }

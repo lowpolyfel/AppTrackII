@@ -1,17 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:pages="clr-namespace:AppTrackII.Pages"
-       xmlns:auth="clr-namespace:AppTrackII.Pages.Auth"
-       xmlns:reg="clr-namespace:AppTrackII.Pages.Register"
-       xmlns:scan="clr-namespace:AppTrackII.Pages.Scan"
-       x:Class="AppTrackII.AppShell"
-       Shell.FlyoutBehavior="Disabled"
-       Shell.NavBarIsVisible="False"
-       BackgroundColor="{StaticResource PageBackgroundColor}">
+<Shell
+    x:Class="AppTrackII.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:scan="clr-namespace:AppTrackII.Pages.Scan"
+    xmlns:scrap="clr-namespace:AppTrackII.Pages.Scrap"
+    xmlns:retrabajo="clr-namespace:AppTrackII.Pages.Retrabajo"
+    xmlns:auth="clr-namespace:AppTrackII.Pages.Auth"
+    Title="AppTrackII"
+    Shell.FlyoutBehavior="Disabled">
 
-    <!-- Home sigue siendo la primera pantalla -->
-    <ShellContent
-        Route="HomePage"
-        ContentTemplate="{DataTemplate pages:HomePage}" />
+    <Shell.Resources>
+        <Style x:Key="BaseStyle" TargetType="Element">
+            <Setter Property="Shell.BackgroundColor" Value="#2196F3" />
+            <Setter Property="Shell.ForegroundColor" Value="White" />
+            <Setter Property="Shell.TitleColor" Value="White" />
+            <Setter Property="Shell.DisabledColor" Value="#B4FFFFFF" />
+            <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
+            <Setter Property="Shell.TabBarBackgroundColor" Value="#2196F3" />
+            <Setter Property="Shell.TabBarForegroundColor" Value="White" />
+            <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF" />
+            <Setter Property="Shell.TabBarTitleColor" Value="White" />
+        </Style>
+    </Shell.Resources>
+
+    <TabBar>
+        <Tab Title="Escanear" Icon="dotnet_bot.png">
+            <ShellContent 
+                Title="Escanear"
+                ContentTemplate="{DataTemplate scan:ScanPage}"
+                Route="ScanPage" />
+        </Tab>
+
+        <Tab Title="Retrabajo" Icon="dotnet_bot.png">
+            <ShellContent 
+                Title="Retrabajo"
+                ContentTemplate="{DataTemplate retrabajo:RetrabajoPage}"
+                Route="RetrabajoPage" />
+        </Tab>
+
+        <Tab Title="Scrap" Icon="dotnet_bot.png">
+            <ShellContent 
+                Title="Scrap"
+                ContentTemplate="{DataTemplate scrap:ScrapPage}"
+                Route="ScrapPage" />
+        </Tab>
+    </TabBar>
+
 </Shell>

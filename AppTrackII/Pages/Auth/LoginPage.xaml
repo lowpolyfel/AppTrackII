@@ -1,36 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:AppTrackII.ViewModels"
-    x:Class="AppTrackII.Pages.Auth.LoginPage">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppTrackII.ViewModels"
+             x:Class="AppTrackII.Pages.Auth.LoginPage"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.BindingContext>
         <vm:LoginViewModel />
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="Auto, *">
-        <Button Grid.Row="0" Text="← Volver" 
-                Command="{Binding CancelCommand}" 
-                HorizontalOptions="Start" 
-                BackgroundColor="Transparent" 
-                TextColor="{StaticResource TextSecondaryColor}"
-                Margin="10,10,0,0"/>
+    <Grid RowDefinitions="*,Auto" Padding="30">
 
-        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="30">
+        <VerticalStackLayout Spacing="20" VerticalOptions="Center">
 
-            <Label Text="Bienvenido" Style="{StaticResource TitleLabelStyle}" HorizontalOptions="Center"/>
+            <Image Source="apptrack_logo.png" 
+                   HeightRequest="120" 
+                   HorizontalOptions="Center" />
 
-            <Frame WidthRequest="360">
-                <VerticalStackLayout Spacing="16">
-                    <Label Text="Credenciales de acceso" Style="{StaticResource SubtitleLabelStyle}" />
+            <Label Text="Bienvenido" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" 
+                   TextColor="{StaticResource Primary}" />
 
-                    <Entry Placeholder="Usuario" Text="{Binding Usuario}" />
-                    <Entry Placeholder="Contraseña" IsPassword="True" Text="{Binding Password}" />
-
-                    <Button Text="Ingresar al sistema" Command="{Binding LoginCommand}" />
-                </VerticalStackLayout>
+            <Frame Padding="0" HasShadow="False" BorderColor="{StaticResource Gray200}" BackgroundColor="{StaticResource Gray100}">
+                <Entry Placeholder="Usuario (ej. PISO-xxxx)" 
+                       Text="{Binding Username}" 
+                       TextColor="Black"
+                       Margin="10,0"/>
             </Frame>
+
+            <Frame Padding="0" HasShadow="False" BorderColor="{StaticResource Gray200}" BackgroundColor="{StaticResource Gray100}">
+                <Entry Placeholder="Contraseña / PIN" 
+                       Text="{Binding Password}" 
+                       IsPassword="True" 
+                       TextColor="Black"
+                       Margin="10,0"/>
+            </Frame>
+
+            <Button Text="INICIAR SESIÓN" 
+                    Command="{Binding LoginCommand}" 
+                    BackgroundColor="{StaticResource Primary}" 
+                    CornerRadius="25" 
+                    HeightRequest="50"
+                    FontAttributes="Bold"/>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource Primary}" />
+
         </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="5" Padding="0,0,0,20">
+            <Label Text="¿Nuevo dispositivo?" 
+                   TextColor="{StaticResource Gray500}" 
+                   HorizontalOptions="Center" />
+
+            <Button Text="Configurar y Registrar" 
+                    Command="{Binding GoToRegisterCommand}" 
+                    BackgroundColor="Transparent" 
+                    TextColor="{StaticResource Primary}" 
+                    FontAttributes="Bold"/>
+        </VerticalStackLayout>
+
     </Grid>
 </ContentPage>

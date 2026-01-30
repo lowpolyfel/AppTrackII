@@ -1,13 +1,15 @@
 ﻿using AppTrackII.Pages;
+using AppTrackII.Pages.Auth;
+using AppTrackII.Pages.Retrabajo;  // Nuevo
+using AppTrackII.Pages.Scan;
+using AppTrackII.Pages.Scrap;      // Nuevo
 using AppTrackII.Services;
 using AppTrackII.ViewModels;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
-using AppTrackII.Pages.Scan;
-using AppTrackII.Pages.Scrap;      // Nuevo
-using AppTrackII.Pages.Retrabajo;  // Nuevo
 using ZXing.Net.Maui.Controls;
+
 
 namespace AppTrackII
 {
@@ -27,6 +29,9 @@ namespace AppTrackII
                 });
 
             // Servicios
+            // Auth
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<LoginPage>();
 
             // ViewModels existentes
             builder.Services.AddTransient<ScanViewModel>();
