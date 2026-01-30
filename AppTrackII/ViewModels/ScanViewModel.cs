@@ -1,5 +1,6 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
@@ -10,8 +11,6 @@ namespace AppTrackII.ViewModels
 {
     public class ScanViewModel : BaseViewModel
     {
-        private readonly ApiClient _apiClient = new();
-
         // ======= CONTEXTO USUARIO / DISPOSITIVO =======
 
         private string _username = string.Empty;
@@ -21,7 +20,7 @@ namespace AppTrackII.ViewModels
             set => SetProperty(ref _username, value);
         }
 
-        private string _deviceName = "Nombre de dispositivo";
+        private string _deviceName = "Dispositivo";
         public string DeviceName
         {
             get => _deviceName;
@@ -34,6 +33,8 @@ namespace AppTrackII.ViewModels
             get => _deviceLocalidad;
             set => SetProperty(ref _deviceLocalidad, value);
         }
+
+        private uint _deviceId;
 
         // ======= CAMPOS DE ESCANEO =======
 
@@ -51,8 +52,8 @@ namespace AppTrackII.ViewModels
             set => SetProperty(ref _numeroParte, value);
         }
 
-        private string _cantidadPiezas = string.Empty;
-        public string CantidadPiezas
+        private int _cantidadPiezas;
+        public int CantidadPiezas
         {
             get => _cantidadPiezas;
             set => SetProperty(ref _cantidadPiezas, value);
@@ -99,52 +100,14 @@ namespace AppTrackII.ViewModels
         }
 
         // Se llama desde ScanPage.OnAppearing()
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
             Username = Preferences.Get("Usuario", string.Empty);
-            var deviceToken = Preferences.Get("DeviceToken", string.Empty);
+            DeviceName = Preferences.Get("DeviceName", "Dispositivo");
+            DeviceLocalidad = Preferences.Get("LocalidadNombre", "Sin localidad");
+            _deviceId = (uint)Preferences.Get("DeviceId", 0);
 
-            if (string.IsNullOrWhiteSpace(deviceToken))
-            {
-                DeviceName = "Dispositivo no registrado";
-                DeviceLocalidad = "Sin localidad";
-                return;
-            }
-
-            var body = new
-            {
-                DeviceToken = deviceToken,
-                Username = Username
-            };
-
-            try
-            {
-                var ctx = await _apiClient.PostAsync<DeviceContextResponse>("context", body);
-
-                if (ctx != null && ctx.Ok)
-                {
-                    if (!string.IsNullOrWhiteSpace(ctx.Username))
-                        Username = ctx.Username;
-
-                    DeviceName = string.IsNullOrWhiteSpace(ctx.DeviceName)
-                        ? "Sin nombre"
-                        : ctx.DeviceName!;
-
-                    DeviceLocalidad = string.IsNullOrWhiteSpace(ctx.LocalidadNombre)
-                        ? "Sin localidad"
-                        : ctx.LocalidadNombre!;
-                }
-                else
-                {
-                    DeviceName = "Dispositivo desconocido";
-                    DeviceLocalidad = "Sin localidad";
-                }
-            }
-            catch
-            {
-                DeviceName = "Error al cargar dispositivo";
-                DeviceLocalidad = "Error";
-            }
+            return Task.CompletedTask;
         }
 
         // ======= LÓGICA DE CÁMARA / ESCANEO =======
@@ -152,9 +115,9 @@ namespace AppTrackII.ViewModels
         private void LoadMockCameras()
         {
             Cameras.Clear();
-            Cameras.Add("Cámara frontal");
             Cameras.Add("Cámara trasera");
-            SelectedCamera = Cameras.Count > 0 ? Cameras[0] : null;
+            Cameras.Add("Cámara frontal");
+            SelectedCamera = Cameras.FirstOrDefault();
         }
 
         private void StartScan()
@@ -180,23 +143,22 @@ namespace AppTrackII.ViewModels
             if (string.IsNullOrWhiteSpace(value))
                 return;
 
-            // Por ahora lo ponemos en el campo Lote.
-            Lote = value;
+            value = value.Trim();
+
+            // ======= REGLA TRACKII =======
+            // Lote: exactamente 7 dígitos numéricos
+            if (value.Length == 7 && value.All(char.IsDigit))
+            {
+                Lote = value;
+                CameraStatusMessage = $"Lote detectado: {value}";
+            }
+            else
+            {
+                NumeroParte = value;
+                CameraStatusMessage = $"No. Parte detectado: {value}";
+            }
+
             IsDetecting = false;
-            CameraStatusMessage = $"Código detectado: {value}";
-        }
-
-        // ======= DTO respuesta /context =======
-
-        private class DeviceContextResponse
-        {
-            public bool Ok { get; set; }
-            public string? Error { get; set; }
-            public string? Username { get; set; }
-            public string? Rol { get; set; }
-            public string? DeviceName { get; set; }
-            public int? LocalidadId { get; set; }
-            public string? LocalidadNombre { get; set; }
         }
     }
 }

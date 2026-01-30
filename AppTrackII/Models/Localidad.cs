@@ -1,10 +1,11 @@
-﻿using System;
+﻿namespace AppTrackII.Models;
 
-namespace AppTrackII.Models
+public class Localidad
 {
-    public class Localidad
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-    }
+    public uint Id { get; set; }
+    public string Nombre { get; set; } = "";
+    public bool Active { get; set; }
+
+    // Para mostrar todas, incluyendo inactivas etiquetadas
+    public string Display => Active ? Nombre : $"{Nombre} (Inactiva)";
 }

@@ -27,7 +27,6 @@ namespace AppTrackII
                 });
 
             // Servicios
-            builder.Services.AddSingleton<ILocalidadService, MockLocalidadService>();
 
             // ViewModels existentes
             builder.Services.AddTransient<ScanViewModel>();

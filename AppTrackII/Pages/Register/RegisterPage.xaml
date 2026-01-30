@@ -27,8 +27,11 @@
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="UBICACIÓN" FontSize="10" TextColor="{StaticResource TextSecondaryColor}"/>
-                            <Picker ItemsSource="{Binding Localidades}" ItemDisplayBinding="{Binding Nombre}" SelectedItem="{Binding LocalidadSeleccionada}" Title="Seleccionar..." />
+                            <Label Text="UBICACIÓN (TODAS)" FontSize="10" TextColor="{StaticResource TextSecondaryColor}"/>
+                            <Picker ItemsSource="{Binding Localidades}"
+                                    ItemDisplayBinding="{Binding Display}"
+                                    SelectedItem="{Binding LocalidadSeleccionada}"
+                                    Title="Seleccionar..." />
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="4">
@@ -36,7 +39,12 @@
                             <Entry Placeholder="Ej: Tablet Recepción 01" Text="{Binding NombreDispositivo}" />
                         </VerticalStackLayout>
 
-                        <Button Text="Guardar Configuración" Command="{Binding RegisterCommand}" Margin="0,10,0,0"/>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="PIN / PASSWORD" FontSize="10" TextColor="{StaticResource TextSecondaryColor}"/>
+                            <Entry Placeholder="Define un PIN" Text="{Binding Password}" IsPassword="True" />
+                        </VerticalStackLayout>
+
+                        <Button Text="Registrar" Command="{Binding RegisterCommand}" Margin="0,10,0,0"/>
                     </VerticalStackLayout>
                 </Frame>
             </VerticalStackLayout>

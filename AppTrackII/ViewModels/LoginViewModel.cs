@@ -10,8 +10,6 @@ namespace AppTrackII.ViewModels;
 
 public class LoginViewModel : BaseViewModel
 {
-    private readonly ApiClient _apiClient = new();
-
     private string _usuario = string.Empty;
     private string _password = string.Empty;
     private bool _isBusy;
@@ -67,41 +65,24 @@ public class LoginViewModel : BaseViewModel
                 return;
             }
 
-            // Leer DeviceToken almacenado (lo generará el registro del dispositivo)
-            var deviceToken = Preferences.Get("DeviceToken", string.Empty);
+            // Login REAL contra Trackii.Web
+            var token = await ApiClient.LoginAsync(Usuario, Password);
 
-            var body = new
-            {
-                Usuario = this.Usuario,
-                Password = this.Password,
-                DeviceToken = deviceToken
-            };
-
-            var result = await _apiClient.PostAsync<LoginResponseDto>("login", body);
-
-            if (result == null)
+            if (string.IsNullOrWhiteSpace(token))
             {
                 await Application.Current.MainPage.DisplayAlert(
-                    "Error", "No se pudo conectar con el servidor.", "OK");
+                    "Login fallido",
+                    "Credenciales inválidas o error de conexión.",
+                    "OK");
                 return;
             }
 
-            if (!result.Ok)
-            {
-                await Application.Current.MainPage.DisplayAlert(
-                    "Login fallido", result.Error ?? "Credenciales inválidas.", "OK");
-                return;
-            }
-
-            // Guardar datos básicos
-            Preferences.Set("Usuario", result.Username ?? string.Empty);
-            Preferences.Set("Rol", result.Rol ?? string.Empty);
-            if (result.LocalidadId.HasValue)
-                Preferences.Set("LocalidadId", result.LocalidadId.Value);
+            // Guardar datos mínimos (lo demás se obtiene vía API)
+            Preferences.Set("Usuario", Usuario);
 
             await Application.Current.MainPage.DisplayAlert(
                 "Bienvenido",
-                $"Usuario: {result.Username}\nRol: {result.Rol}\nLocalidad: {result.LocalidadNombre}",
+                $"Usuario: {Usuario}",
                 "OK");
 
             await Shell.Current.GoToAsync(nameof(ScanPage));
@@ -117,17 +98,5 @@ public class LoginViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-    }
-
-    // DTO para mapear la respuesta JSON del API
-    private class LoginResponseDto
-    {
-        public bool Ok { get; set; }
-        public string? Error { get; set; }
-        public int? UsuarioId { get; set; }
-        public string? Username { get; set; }
-        public string? Rol { get; set; }
-        public int? LocalidadId { get; set; }
-        public string? LocalidadNombre { get; set; }
     }
 }
